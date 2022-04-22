@@ -27,6 +27,7 @@ def start_session(word_count, session_count, word_delay):
     done_sessions = 0
     done_words = 0
     while done_sessions <= session_count:
+        # Start a new session
         driver.find_element_by_class_name("btn-session").click()
         driver.implicitly_wait(5)
         try:
@@ -35,18 +36,33 @@ def start_session(word_count, session_count, word_delay):
             driver.find_element_by_id("continue_session_button").click()
 
         while done_words <= word_count:
+            # Find answer field and submit the answer
             driver.find_element_by_id("answer").send_keys(input("Odpowiedz: "))
             driver.find_element_by_id("check").click()
+            sleep(.5)
+            # Check result
+            try:
+                driver.find_element_by_class_name("green")
+                print("Poprawna odpowiedz")
+                done_words += 1
+            except:
+                try:
+                    driver.find_element_by_class_name("red")
+                    print("Niepoprawna odpowiedz")
+                except:
+                    try:
+                        driver.find_element_by_class_name("blue")
+                        print("Synonim")
+                    except:
+                        pass
+
             sleep(word_delay)
             try:
-                driver.find_element_by_id("nextword").click()
-            except:
-                pass
-            try:
                 driver.find_element_by_id("return_mainpage").click()
+                break
             except:
-                pass
-            done_words += 1
+                driver.find_element_by_id("nextword").click()
+
     done_sessions += 1
 
 
