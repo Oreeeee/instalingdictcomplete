@@ -26,7 +26,7 @@ def start_session(session_count, word_delay):
 
     done_sessions = 0
     while done_sessions < session_count:
-        # Start a new session
+        # Start session loop
         driver.find_element_by_class_name("btn-session").click()
         driver.implicitly_wait(5)
         try:
@@ -34,6 +34,7 @@ def start_session(session_count, word_delay):
         except:
             driver.find_element_by_id("continue_session_button").click()
 
+        # Start a new session
         while True:
             # Check if session is done
             try:
