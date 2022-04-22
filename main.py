@@ -52,7 +52,7 @@ def start_session(word_count, session_count, word_delay):
                 except:
                     try:
                         driver.find_element_by_class_name("blue")
-                        print("Synonim")
+                        print("Literowka/Synonim")
                     except:
                         pass
 

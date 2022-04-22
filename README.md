@@ -1,1 +1,3 @@
 # Instaling Dict Complete
+UWAGA! KOD W AKTUALNYM STANIE NIE MOZE AUTOMATYCZNIE UZUPELNIAC SLOWEK!
+Polecam obserwowac repo 👍
