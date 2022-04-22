@@ -22,10 +22,9 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(word_count, session_count, word_delay):
+def start_session(session_count, word_delay):
 
     done_sessions = 0
-    done_words = 0
     while done_sessions <= session_count:
         # Start a new session
         driver.find_element_by_class_name("btn-session").click()
@@ -35,12 +34,14 @@ def start_session(word_count, session_count, word_delay):
         except:
             driver.find_element_by_id("continue_session_button").click()
 
-        while done_words <= word_count:
+        while True:
+            # Check if session is done
             try:
                 driver.find_element_by_id("return_mainpage").click()
                 break
             except:
                 pass
+
             # Find answer field and submit the answer
             print("Slowo: " + driver.find_element_by_class_name("translations").text)
             driver.find_element_by_id("answer").send_keys(input("Odpowiedz: "))
@@ -50,7 +51,6 @@ def start_session(word_count, session_count, word_delay):
             try:
                 driver.find_element_by_class_name("green")
                 print("Poprawna odpowiedz")
-                done_words += 1
             except:
                 try:
                     driver.find_element_by_class_name("red")
@@ -83,11 +83,10 @@ def main():
             print("Nie udalo sie zalogowac!")
 
     while True:
-        word_count = int(input("Ile slow ma sesja?: "))
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
         # word_delay = 0  # Temp value
-        start_session(word_count, session_count, word_delay)
+        start_session(session_count, word_delay)
 
 
 if __name__ == '__main__':
