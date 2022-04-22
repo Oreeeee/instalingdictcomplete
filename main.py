@@ -25,7 +25,7 @@ def instaling_login(login, password):
 def start_session(session_count, word_delay):
 
     done_sessions = 0
-    while done_sessions <= session_count:
+    while done_sessions < session_count:
         # Start a new session
         driver.find_element_by_class_name("btn-session").click()
         driver.implicitly_wait(5)
