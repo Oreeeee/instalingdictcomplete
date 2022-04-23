@@ -20,10 +20,6 @@ def save_dictionary(dictionary_file, imported_dictionary):
         f.close()
 
 
-def save_dictionary(imported_dictionary, dictionary_file):
-    # TODO: Add code to save dictionary to json
-
-
 def instaling_login(login, password):
     driver.get("https://instaling.pl/teacher.php?page=login")
     driver.implicitly_wait(5)
