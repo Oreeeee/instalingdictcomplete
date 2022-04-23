@@ -92,10 +92,12 @@ def main():
         else:
             print("Nie udalo sie zalogowac!")
 
+    dictionary_file = {}
+
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
-        dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
+        #dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
         dictionary_file = start_session(session_count, word_delay, dictionary_file)
 
 
