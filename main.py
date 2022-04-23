@@ -1,5 +1,7 @@
 from selenium import webdriver
 from time import sleep
+import csv
+import os
 
 # Initialize webdriver
 driver = webdriver.Firefox()
@@ -22,8 +24,7 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(session_count, word_delay):
-
+def start_session(session_count, word_delay, dictionary_file):
     done_sessions = 0
     while done_sessions < session_count:
         # Start a new session
@@ -43,8 +44,16 @@ def start_session(session_count, word_delay):
                 pass
 
             # Find answer field and submit the answer
-            print("Slowo: " + driver.find_element_by_class_name("translations").text)
-            driver.find_element_by_id("answer").send_keys(input("Odpowiedz: "))
+            polish_word = driver.find_element_by_class_name("translations").text
+            print(f"Slowo: {polish_word}")
+            answer_field = driver.find_element_by_id("answer")
+            try:
+                answer_field.send_keys(dictionary_file[polish_word])
+            except:
+                pass
+
+            sleep(word_delay)
+
             driver.find_element_by_id("check").click()
             sleep(.5)
             # Check result
@@ -55,15 +64,15 @@ def start_session(session_count, word_delay):
                 try:
                     driver.find_element_by_class_name("red")
                     print("Niepoprawna odpowiedz")
-                    print("Poprawna odpowiedz: " + driver.find_element_by_id("word").text)
+                    english_word = driver.find_element_by_id("word").text
+                    print(f"Poprawna odpowiedz: {english_word}")
+                    dictionary_file[polish_word] = english_word
                 except:
                     try:
                         driver.find_element_by_class_name("blue")
                         print("Literowka/Synonim")
                     except:
                         pass
-
-            sleep(word_delay)
 
             driver.find_element_by_id("nextword").click()
 
@@ -82,11 +91,13 @@ def main():
         else:
             print("Nie udalo sie zalogowac!")
 
+    dictionary_file = {}
+
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
-        # word_delay = 0  # Temp value
-        start_session(session_count, word_delay)
+        #dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
+        dictionary_file = start_session(session_count, word_delay, dictionary_file)
 
 
 if __name__ == '__main__':
