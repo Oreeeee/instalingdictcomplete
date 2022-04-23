@@ -1,10 +1,27 @@
 from selenium import webdriver
 from time import sleep
-import csv
+import json
 import os
 
 # Initialize webdriver
 driver = webdriver.Firefox()
+
+
+def import_dictionary(dictionary_file):
+    imported_dictionary = json.load(open(dictionary_file))
+    return imported_dictionary
+
+
+def save_dictionary(dictionary_file, imported_dictionary):
+    os.remove(dictionary_file)
+    j = json.dumps(imported_dictionary)
+    with.open(dictionary_file, "w") as f:
+        f.write(j)
+        f.close()
+
+
+def save_dictionary(imported_dictionary, dictionary_file):
+    # TODO: Add code to save dictionary to json
 
 
 def instaling_login(login, password):
@@ -24,7 +41,7 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(session_count, word_delay, dictionary_file):
+def start_session(session_count, word_delay, imported_dictionary):
     done_sessions = 0
     while done_sessions < session_count:
         # Start session loop
@@ -49,7 +66,7 @@ def start_session(session_count, word_delay, dictionary_file):
             print(f"Slowo: {polish_word}")
             answer_field = driver.find_element_by_id("answer")
             try:
-                answer_field.send_keys(dictionary_file[polish_word])
+                answer_field.send_keys(imported_dictionary[polish_word])
             except:
                 pass
 
@@ -67,7 +84,7 @@ def start_session(session_count, word_delay, dictionary_file):
                     print("Niepoprawna odpowiedz")
                     english_word = driver.find_element_by_id("word").text
                     print(f"Poprawna odpowiedz: {english_word}")
-                    dictionary_file[polish_word] = english_word
+                    imported_dictionary[polish_word] = english_word
                 except:
                     try:
                         driver.find_element_by_class_name("blue")
@@ -77,7 +94,8 @@ def start_session(session_count, word_delay, dictionary_file):
 
             driver.find_element_by_id("nextword").click()
 
-    done_sessions += 1
+        done_sessions += 1
+    return imported_dictionary
 
 
 def main():
@@ -92,13 +110,12 @@ def main():
         else:
             print("Nie udalo sie zalogowac!")
 
-    dictionary_file = {}
-
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
-        #dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
-        dictionary_file = start_session(session_count, word_delay, dictionary_file)
+        imported_dictionary = import_dictionary(input("Z jakiego pliku slownika skorzystac?: "))
+        imported_dictionary = start_session(session_count, word_delay, imported_dictionary)
+        save_dictionary(dictionary_file, imported_dictionary)
 
 
 if __name__ == '__main__':
