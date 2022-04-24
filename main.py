@@ -15,7 +15,7 @@ def import_dictionary(dictionary_file):
 def save_dictionary(dictionary_file, imported_dictionary):
     os.remove(dictionary_file)
     j = json.dumps(imported_dictionary)
-    with.open(dictionary_file, "w") as f:
+    with(open(dictionary_file, "w")) as f:
         f.write(j)
         f.close()
 
@@ -53,6 +53,7 @@ def start_session(session_count, word_delay, imported_dictionary):
             # Check if session is done
             try:
                 driver.find_element_by_id("return_mainpage").click()
+                sleep(.5)
                 break
             except:
                 pass
