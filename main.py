@@ -109,7 +109,8 @@ def main():
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
-        imported_dictionary = import_dictionary(input("Z jakiego pliku slownika skorzystac?: "))
+        dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
+        imported_dictionary = import_dictionary(dictionary_file)
         imported_dictionary = start_session(session_count, word_delay, imported_dictionary)
         save_dictionary(dictionary_file, imported_dictionary)
 
