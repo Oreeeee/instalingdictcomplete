@@ -43,7 +43,7 @@ def start_session(session_count, word_delay, imported_dictionary):
         driver.find_element_by_class_name("btn-session").click()
         driver.implicitly_wait(5)
         try:
-            driver.find_element_by_class_name("big_button").click()
+            driver.find_element_by_id("start_session_button").click()
         except:
             driver.find_element_by_id("continue_session_button").click()
 
