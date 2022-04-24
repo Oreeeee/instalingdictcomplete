@@ -4,7 +4,9 @@ import json
 import os
 
 # Initialize webdriver
-driver = webdriver.Firefox()
+firefox_options = webdriver.FirefoxOptions()
+firefox_options.add_argument("-headless")
+driver = webdriver.Firefox(options=firefox_options)
 
 
 def import_dictionary(dictionary_file):
