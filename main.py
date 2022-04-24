@@ -2,10 +2,17 @@ from selenium import webdriver
 from time import sleep
 import json
 import os
+import platform
+
+# Detect OS
+user_os = platform.system()
 
 # Initialize webdriver
 firefox_options = webdriver.FirefoxOptions()
 firefox_options.add_argument("-headless")
+if user_os == "Windows":
+    firefox_binary = FirefoxBinary(r"C:\Program Files\Mozilla Firefox\firefox.exe")
+    driver = webdriver.Firefox(firefox_binary=firefox_binary, options=firefox_options)
 driver = webdriver.Firefox(options=firefox_options)
 
 
