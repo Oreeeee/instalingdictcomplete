@@ -29,8 +29,6 @@ def instaling_login(login, password):
 
     driver.implicitly_wait(5)
 
-    print(driver.current_url)
-
     if driver.current_url == "https://instaling.pl/teacher.php?page=login":
         return False
     else:
@@ -41,6 +39,7 @@ def start_session(session_count, word_delay, imported_dictionary):
     done_sessions = 0
     while done_sessions < session_count:
         # Start session loop
+        driver.implicitly_wait(5)
         driver.find_element_by_class_name("btn-session").click()
         driver.implicitly_wait(5)
         try:
