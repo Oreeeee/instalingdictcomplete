@@ -59,10 +59,11 @@ def start_session(session_count, word_delay, imported_dictionary):
 
             # Find answer field and submit the answer
             polish_word = driver.find_element_by_class_name("translations").text
-            print(f"Slowo: {polish_word}")
+            usage_example = driver.find_element_by_class_name("usage_example").text
+            print(f"Slowo: {polish_word}, Przyklad uzycia: {usage_example}")
             answer_field = driver.find_element_by_id("answer")
             try:
-                answer_field.send_keys(imported_dictionary[polish_word])
+                answer_field.send_keys(imported_dictionary[usage_example])
             except:
                 pass
 
@@ -80,7 +81,7 @@ def start_session(session_count, word_delay, imported_dictionary):
                     print("Niepoprawna odpowiedz")
                     english_word = driver.find_element_by_id("word").text
                     print(f"Poprawna odpowiedz: {english_word}")
-                    imported_dictionary[polish_word] = english_word
+                    imported_dictionary[usage_example] = english_word
                 except:
                     try:
                         driver.find_element_by_class_name("blue")
