@@ -50,9 +50,9 @@ def start_session(session_count, word_delay, imported_dictionary):
     done_sessions = 0
     while done_sessions < session_count:
         # Start session loop
-        driver.implicitly_wait(5)
+        sleep(.5)
         driver.find_element_by_class_name("btn-session").click()
-        driver.implicitly_wait(5)
+        sleep(.5)
         try:
             driver.find_element_by_id("start_session_button").click()
         except:
@@ -62,8 +62,8 @@ def start_session(session_count, word_delay, imported_dictionary):
         while True:
             # Check if session is done
             try:
+                driver.implicitly_wait(5)
                 driver.find_element_by_id("return_mainpage").click()
-                sleep(.5)
                 break
             except:
                 pass
@@ -101,6 +101,7 @@ def start_session(session_count, word_delay, imported_dictionary):
                         pass
 
             driver.find_element_by_id("nextword").click()
+            sleep(.25)
 
         done_sessions += 1
     return imported_dictionary
