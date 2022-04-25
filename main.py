@@ -62,7 +62,6 @@ def start_session(session_count, word_delay, imported_dictionary):
         while True:
             # Check if session is done
             try:
-                driver.implicitly_wait(5)
                 driver.find_element_by_id("return_mainpage").click()
                 break
             except:
