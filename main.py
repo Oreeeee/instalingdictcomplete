@@ -46,9 +46,11 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(session_count, word_delay, imported_dictionary):
+def start_session(session_count, word_delay, dictionary_file):
     done_sessions = 0
     while done_sessions < session_count:
+        imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
+
         # Start session loop
         sleep(.5)
         driver.find_element_by_class_name("btn-session").click()
@@ -102,6 +104,7 @@ def start_session(session_count, word_delay, imported_dictionary):
             driver.find_element_by_id("nextword").click()
             sleep(.25)
 
+        save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
         done_sessions += 1
     return imported_dictionary
 
@@ -122,9 +125,7 @@ def main():
         session_count = int(input("Ile sesji wykonac?: "))
         word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
         dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
-        imported_dictionary = import_dictionary(dictionary_file)
-        imported_dictionary = start_session(session_count, word_delay, imported_dictionary)
-        save_dictionary(dictionary_file, imported_dictionary)
+        start_session(session_count, word_delay, dictionary_file)
 
 
 if __name__ == '__main__':
