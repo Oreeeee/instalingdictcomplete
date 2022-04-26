@@ -4,6 +4,7 @@ from time import sleep
 import json
 import os
 import platform
+import random
 
 # Detect OS
 user_os = platform.system()
@@ -31,6 +32,15 @@ def save_dictionary(dictionary_file, imported_dictionary):
         f.close()
 
 
+def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
+    if delay_type == "letter":
+        delay = random.uniform(min_letterdelay, max_letterdelay)
+    elif delay_type == "word":
+        delay = random.uniform(min_worddelay, max_worddelay)
+
+    return delay
+
+
 def instaling_login(login, password):
     driver.get("https://instaling.pl/teacher.php?page=login")
     driver.implicitly_wait(5)
@@ -46,7 +56,7 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(session_count, word_delay, dictionary_file):
+def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file):
     done_sessions = 0
     while done_sessions < session_count:
         imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
@@ -74,12 +84,20 @@ def start_session(session_count, word_delay, dictionary_file):
             usage_example = driver.find_element_by_class_name("usage_example").text
             print(f"Slowo: {polish_word}, Przyklad uzycia: {usage_example}")
             answer_field = driver.find_element_by_id("answer")
+
+            delay_type = "word"
+            sleep(generate_delay(delay_type, min_letterdelay,
+                  max_letterdelay, min_worddelay, max_worddelay))
+
             try:
-                answer_field.send_keys(imported_dictionary[usage_example])
+                english_word = imported_dictionary[usage_example]
+                for letter in english_word:
+                    delay_type = "letter"
+                    sleep(generate_delay(delay_type, min_letterdelay,
+                          max_letterdelay, min_worddelay, max_worddelay))
+                    answer_field.send_keys(letter)
             except:
                 pass
-
-            sleep(word_delay)
 
             driver.find_element_by_id("check").click()
             sleep(.5)
@@ -123,9 +141,17 @@ def main():
 
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
-        word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
+        # word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
+
+        min_letterdelay = float(input("Podaj minimalne opoznienie pomiedzy literami: "))
+        max_letterdelay = float(input("Podaj maksymalne opoznienie pomiedzy literami: "))
+
+        min_worddelay = float(input("Podaj minimalne opoznienie pomiedzy slowami: "))
+        max_worddelay = float(input("Podaj maksymalne opoznienie pomiedzy slowami: "))
+
         dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
-        start_session(session_count, word_delay, dictionary_file)
+        start_session(session_count, min_letterdelay, max_letterdelay,
+                      min_worddelay, max_worddelay, dictionary_file)
 
 
 if __name__ == '__main__':
