@@ -91,7 +91,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                   max_letterdelay, min_worddelay, max_worddelay))
 
             # Fail on purpose
-            if random.randint(1, 100) < random_fail_percentage:
+            if random.randint(1, 100) <= random_fail_percentage:
                 try:
                     english_word = imported_dictionary[usage_example]
                     for letter in english_word:
