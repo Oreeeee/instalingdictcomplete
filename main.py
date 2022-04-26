@@ -34,9 +34,9 @@ def save_dictionary(dictionary_file, imported_dictionary):
 
 def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
     if delay_type == "letter":
-        delay = random.uniform(min_letterdelay, max_letterdelay)
+        delay = round(random.uniform(min_letterdelay, max_letterdelay), 3)
     elif delay_type == "word":
-        delay = random.uniform(min_worddelay, max_worddelay)
+        delay = round(random.uniform(min_worddelay, max_worddelay), 3)
 
     return delay
 
@@ -56,8 +56,9 @@ def instaling_login(login, password):
         return True
 
 
-def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file):
+def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
     done_sessions = 0
+    fail_on_purpose = False
     while done_sessions < session_count:
         imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
 
@@ -89,15 +90,23 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             sleep(generate_delay(delay_type, min_letterdelay,
                   max_letterdelay, min_worddelay, max_worddelay))
 
-            try:
-                english_word = imported_dictionary[usage_example]
-                for letter in english_word:
-                    delay_type = "letter"
-                    sleep(generate_delay(delay_type, min_letterdelay,
-                          max_letterdelay, min_worddelay, max_worddelay))
-                    answer_field.send_keys(letter)
-            except:
-                pass
+            # Fail on purpose
+            if random.randint(1, 100) < random_fail_percentage:
+                try:
+                    english_word = imported_dictionary[usage_example]
+                    for letter in english_word:
+                        delay_type = "letter"
+                        sleep(generate_delay(delay_type, min_letterdelay,
+                              max_letterdelay, min_worddelay, max_worddelay))
+                        answer_field.send_keys(letter)
+                except:
+                    pass
+
+                fail_on_purpose == False
+
+            else:
+                print("Celowy brak odpowiedzi")
+                fail_on_purpose == True
 
             driver.find_element_by_id("check").click()
             sleep(.5)
@@ -111,7 +120,10 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     print("Niepoprawna odpowiedz")
                     english_word = driver.find_element_by_id("word").text
                     print(f"Poprawna odpowiedz: {english_word}")
-                    imported_dictionary[usage_example] = english_word
+
+                    # Only add correct answer to dictionary when not failed on purpose
+                    if fail_on_purpose == False:
+                        imported_dictionary[usage_example] = english_word
                 except:
                     try:
                         driver.find_element_by_class_name("blue")
@@ -141,7 +153,6 @@ def main():
 
     while True:
         session_count = int(input("Ile sesji wykonac?: "))
-        # word_delay = int(input("Jakie ma byc opoznienie pomiedzy slowami? (sek.): "))
 
         min_letterdelay = float(input("Podaj minimalne opoznienie pomiedzy literami: "))
         max_letterdelay = float(input("Podaj maksymalne opoznienie pomiedzy literami: "))
@@ -149,9 +160,11 @@ def main():
         min_worddelay = float(input("Podaj minimalne opoznienie pomiedzy slowami: "))
         max_worddelay = float(input("Podaj maksymalne opoznienie pomiedzy slowami: "))
 
+        random_fail_percentage = int(input("Ile procent odpowiedzi ma byc poprawnych?: "))
+
         dictionary_file = input("Z jakiego pliku slownika skorzystac?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
-                      min_worddelay, max_worddelay, dictionary_file)
+                      min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
 
 
 if __name__ == '__main__':
