@@ -66,10 +66,16 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
         sleep(.5)
         driver.find_element_by_class_name("btn-session").click()
         sleep(.5)
-        try:
-            driver.find_element_by_id("start_session_button").click()
-        except:
-            driver.find_element_by_id("continue_session_button").click()
+        while True:
+            try:
+                try:
+                    driver.find_element_by_id("start_session_button").click()
+                    break
+                except:
+                    driver.find_element_by_id("continue_session_button").click()
+                    break
+            except:
+                pass
 
         # Start a new session
         while True:
