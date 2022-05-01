@@ -131,7 +131,13 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     except:
                         pass
 
-            driver.find_element_by_id("nextword").click()
+            while True:
+                try:
+                    driver.find_element_by_id("nextword").click()
+                    break
+                except:
+                    pass
+
             sleep(.25)
 
         save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
