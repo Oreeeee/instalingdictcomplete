@@ -114,7 +114,12 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 print("Celowy brak odpowiedzi")
                 fail_on_purpose == True
 
-            driver.find_element_by_id("check").click()
+            while True:
+                try:
+                    driver.find_element_by_id("check").click()
+                    break
+                except:
+                    pass
             sleep(.5)
             # Check result
             try:
