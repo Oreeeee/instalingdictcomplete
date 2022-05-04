@@ -11,12 +11,15 @@ user_os = platform.system()
 
 # Initialize webdriver
 firefox_options = webdriver.FirefoxOptions()
+firefox_profile = webdriver.FirefoxProfile()
 firefox_options.add_argument("-headless")
+firefox_profile.set_preference("media.volume_scale", "0.0")
 if user_os == "Windows":
     firefox_binary = FirefoxBinary(r"C:\Program Files\Mozilla Firefox\firefox.exe")
-    driver = webdriver.Firefox(firefox_binary=firefox_binary, options=firefox_options)
+    driver = webdriver.Firefox(firefox_binary=firefox_binary,
+                               options=firefox_options, firefox_profile=firefox_profile)
 else:
-    driver = webdriver.Firefox(options=firefox_options)
+    driver = webdriver.Firefox(options=firefox_options, firefox_profile=firefox_profile)
 
 
 def import_dictionary(dictionary_file):
