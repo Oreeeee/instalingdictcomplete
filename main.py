@@ -80,6 +80,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     fail_on_purpose = False
     german_alphabet = "äöüßÄÖÜ"
     is_german = False
+    checked_language = False
     while done_sessions < session_count:
         imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
 
@@ -99,13 +100,16 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 pass
 
         sleep(1)
-        try:
-            driver.find_element(By.CLASS_NAME, "special_character_button")
-            print("Wykryto jezyk niemiecki")
-            is_german = True
-        except:
-            print("Wykryto jezyk angielski")
-            is_german = False
+        if checked_language == False:
+            try:
+                driver.find_element(By.CLASS_NAME, "special_character_button")
+                print("Wykryto jezyk niemiecki")
+                is_german = True
+                checked_language = True
+            except:
+                print("Wykryto jezyk angielski")
+                is_german = False
+                checked_language = True
 
         # Start a new session
         while True:
