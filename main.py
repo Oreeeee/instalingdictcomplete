@@ -212,8 +212,8 @@ def main():
         min_letterdelay = float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
         max_letterdelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy literami słowami: "))
-        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami słowami: "))
+        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy literami słowa: "))
+        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami słowa: "))
 
         random_fail_percentage = int(input("Ile procent odpowiedzi ma być poprawnych?: "))
 
