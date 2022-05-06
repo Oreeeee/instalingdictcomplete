@@ -60,6 +60,21 @@ def instaling_login(login, password):
         return True
 
 
+def click_on_german_letter(letter):
+    # This is an example of violation of DRY rule. Don't do this!
+    letters = {
+        "ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[2]').click()",
+        "ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[3]').click()",
+        "ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[4]').click()",
+        "ß": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[5]').click()",
+        "Ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[6]').click()",
+        "Ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[7]').click()",
+        "Ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[8]').click()"
+    }
+
+    exec(letters[letter])
+
+
 def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
     done_sessions = 0
     fail_on_purpose = False
@@ -120,9 +135,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                         sleep(generate_delay(delay_type, min_letterdelay,
                               max_letterdelay, min_worddelay, max_worddelay))
                         if letter in german_alphabet:
-                            # Thanks StackOverflow for XPATH
-                            driver.find_element(
-                                By.XPATH, f'//*[contains(text(), {letter}) and @class="special_character_button"]').click()
+                            click_on_german_letter(letter)
                         else:
                             answer_field.send_keys(letter)
                 except:
