@@ -36,8 +36,12 @@ def save_dictionary(dictionary_file, imported_dictionary):
         f.close()
 
 
-def generate_delay(min_delay, max_delay):
-    delay = (random.uniform(min_delay, max_delay), 3)
+def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
+    if delay_type == "letter":
+        delay = round(random.uniform(min_letterdelay, max_letterdelay), 3)
+    elif delay_type == "word":
+        delay = round(random.uniform(min_worddelay, max_worddelay), 3)
+
     return delay
 
 
@@ -122,15 +126,19 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             print(f"Słowo: {polish_word}, Przykład użycia: {usage_example}")
             answer_field = driver.find_element(By.ID, "answer")
 
+            delay_type = "word"
             for letter in polish_word:
-                sleep(generate_delay(min_delay, max_delay))
+                sleep(generate_delay(delay_type, min_letterdelay,
+                      max_letterdelay, min_worddelay, max_worddelay))
 
             # Fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
                 try:
                     english_word = imported_dictionary[usage_example]
                     for letter in english_word:
-                        sleep(generate_delay(min_delay, max_delay))
+                        delay_type = "letter"
+                        sleep(generate_delay(delay_type, min_letterdelay,
+                              max_letterdelay, min_worddelay, max_worddelay))
                         if letter in german_alphabet:
                             click_on_german_letter(letter)
                         else:
