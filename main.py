@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.common.by import By
 from time import sleep
 import json
 import os
@@ -47,9 +48,9 @@ def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, 
 def instaling_login(login, password):
     driver.get("https://instaling.pl/teacher.php?page=login")
     driver.implicitly_wait(5)
-    driver.find_element_by_id("log_email").send_keys(login)
-    driver.find_element_by_id("log_password").send_keys(password)
-    driver.find_element_by_class_name("mb-3").click()
+    driver.find_element(By.ID, "log_email").send_keys(login)
+    driver.find_element(By.ID, "log_password").send_keys(password)
+    driver.find_element(By.CLASS_NAME, "mb-3").click()
 
     driver.implicitly_wait(5)
 
@@ -67,15 +68,15 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
         # Start session loop
         sleep(.5)
-        driver.find_element_by_class_name("btn-session").click()
+        driver.find_element(By.CLASS_NAME, "btn-session").click()
         sleep(.5)
         while True:
             try:
                 try:
-                    driver.find_element_by_id("start_session_button").click()
+                    driver.find_element(By.ID, "start_session_button").click()
                     break
                 except:
-                    driver.find_element_by_id("continue_session_button").click()
+                    driver.find_element(By.ID, "continue_session_button").click()
                     break
             except:
                 pass
@@ -84,16 +85,16 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
         while True:
             # Check if session is done
             try:
-                driver.find_element_by_id("return_mainpage").click()
+                driver.find_element(By.ID, "return_mainpage").click()
                 break
             except:
                 pass
 
             # Find answer field and submit the answer
-            polish_word = driver.find_element_by_class_name("translations").text
-            usage_example = driver.find_element_by_class_name("usage_example").text
+            polish_word = driver.find_element(By.CLASS_NAME, "translations").text
+            usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
             print(f"Slowo: {polish_word}, Przyklad uzycia: {usage_example}")
-            answer_field = driver.find_element_by_id("answer")
+            answer_field = driver.find_element(By.ID, "answer")
 
             delay_type = "word"
             sleep(generate_delay(delay_type, min_letterdelay,
@@ -119,20 +120,20 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
             while True:
                 try:
-                    driver.find_element_by_id("check").click()
+                    driver.find_element(By.ID, "check").click()
                     break
                 except:
                     pass
             sleep(.5)
             # Check result
             try:
-                driver.find_element_by_class_name("green")
+                driver.find_element(By.CLASS_NAME, "green")
                 print("Poprawna odpowiedz")
             except:
                 try:
-                    driver.find_element_by_class_name("red")
+                    driver.find_element(By.CLASS_NAME, "red")
                     print("Niepoprawna odpowiedz")
-                    english_word = driver.find_element_by_id("word").text
+                    english_word = driver.find_element(By.ID, "word").text
                     print(f"Poprawna odpowiedz: {english_word}")
 
                     # Only add correct answer to dictionary when not failed on purpose
@@ -140,14 +141,14 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                         imported_dictionary[usage_example] = english_word
                 except:
                     try:
-                        driver.find_element_by_class_name("blue")
+                        driver.find_element(By.CLASS_NAME, "blue")
                         print("Literowka/Synonim")
                     except:
                         pass
 
             while True:
                 try:
-                    driver.find_element_by_id("nextword").click()
+                    driver.find_element(By.ID, "nextword").click()
                     break
                 except:
                     pass
