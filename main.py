@@ -88,7 +88,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             driver.find_element(By.CLASS_NAME, "special_character_button")
             print("Wykryto jezyk niemiecki")
             is_german = True
-        else:
+        except:
             print("Wykryto jezyk angielski")
             is_german = False
 
@@ -120,7 +120,9 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                         sleep(generate_delay(delay_type, min_letterdelay,
                               max_letterdelay, min_worddelay, max_worddelay))
                         if letter in german_alphabet:
-                            driver.find_element(By.XPATH, f'//*[contains(text(), {letter}) and @class="special_character_button"]')).click()  # Thanks StackOverflow for XPATH
+                            # Thanks StackOverflow for XPATH
+                            driver.find_element(
+                                By.XPATH, f'//*[contains(text(), {letter}) and @class="special_character_button"]').click()
                         else:
                             answer_field.send_keys(letter)
                 except:
@@ -147,12 +149,12 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 try:
                     driver.find_element(By.CLASS_NAME, "red")
                     print("Niepoprawna odpowiedź")
-                    english_word=driver.find_element(By.ID, "word").text
+                    english_word = driver.find_element(By.ID, "word").text
                     print(f"Poprawna odpowiedź: {english_word}")
 
                     # Only add correct answer to dictionary when not failed on purpose
                     if fail_on_purpose == False:
-                        imported_dictionary[usage_example]=english_word
+                        imported_dictionary[usage_example] = english_word
                 except:
                     try:
                         driver.find_element(By.CLASS_NAME, "blue")
@@ -177,8 +179,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 def main():
     # Log into the website
     while True:
-        login=input("Podaj login do konta ucznia: ")
-        password=input("Podaj hasło: ")
+        login = input("Podaj login do konta ucznia: ")
+        password = input("Podaj hasło: ")
         if instaling_login(login, password) == True:
             print("Zalogowano!")
             driver.implicitly_wait(5)
@@ -187,17 +189,17 @@ def main():
             print("Nie udało się zalogować!")
 
     while True:
-        session_count=int(input("Ile sesji wykonać?: "))
+        session_count = int(input("Ile sesji wykonać?: "))
 
-        min_letterdelay=float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
-        max_letterdelay=float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
+        min_letterdelay = float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
+        max_letterdelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay=float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
-        max_worddelay=float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
+        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
+        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
 
-        random_fail_percentage=int(input("Ile procent odpowiedzi ma być poprawnych?: "))
+        random_fail_percentage = int(input("Ile procent odpowiedzi ma być poprawnych?: "))
 
-        dictionary_file=input("Z jakiego pliku słownika skorzystać?: ")
+        dictionary_file = input("Z jakiego pliku słownika skorzystać?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
                       min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
 
