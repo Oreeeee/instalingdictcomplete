@@ -104,7 +104,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             # Find answer field and submit the answer
             polish_word = driver.find_element(By.CLASS_NAME, "translations").text
             usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
-            print(f"Slowo: {polish_word}, Przyklad uzycia: {usage_example}")
+            print(f"Słowo: {polish_word}, Przykład użycia: {usage_example}")
             answer_field = driver.find_element(By.ID, "answer")
 
             delay_type = "word"
@@ -142,13 +142,13 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             # Check result
             try:
                 driver.find_element(By.CLASS_NAME, "green")
-                print("Poprawna odpowiedz")
+                print("Poprawna odpowiedź")
             except:
                 try:
                     driver.find_element(By.CLASS_NAME, "red")
-                    print("Niepoprawna odpowiedz")
+                    print("Niepoprawna odpowiedź")
                     english_word=driver.find_element(By.ID, "word").text
-                    print(f"Poprawna odpowiedz: {english_word}")
+                    print(f"Poprawna odpowiedź: {english_word}")
 
                     # Only add correct answer to dictionary when not failed on purpose
                     if fail_on_purpose == False:
@@ -178,26 +178,26 @@ def main():
     # Log into the website
     while True:
         login=input("Podaj login do konta ucznia: ")
-        password=input("Podaj haslo: ")
+        password=input("Podaj hasło: ")
         if instaling_login(login, password) == True:
             print("Zalogowano!")
             driver.implicitly_wait(5)
             break
         else:
-            print("Nie udalo sie zalogowac!")
+            print("Nie udało się zalogować!")
 
     while True:
-        session_count=int(input("Ile sesji wykonac?: "))
+        session_count=int(input("Ile sesji wykonać?: "))
 
-        min_letterdelay=float(input("Podaj minimalne opoznienie pomiedzy literami: "))
-        max_letterdelay=float(input("Podaj maksymalne opoznienie pomiedzy literami: "))
+        min_letterdelay=float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
+        max_letterdelay=float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay=float(input("Podaj minimalne opoznienie pomiedzy slowami: "))
-        max_worddelay=float(input("Podaj maksymalne opoznienie pomiedzy slowami: "))
+        min_worddelay=float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
+        max_worddelay=float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
 
-        random_fail_percentage=int(input("Ile procent odpowiedzi ma byc poprawnych?: "))
+        random_fail_percentage=int(input("Ile procent odpowiedzi ma być poprawnych?: "))
 
-        dictionary_file=input("Z jakiego pliku slownika skorzystac?: ")
+        dictionary_file=input("Z jakiego pliku słownika skorzystać?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
                       min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
 
