@@ -143,7 +143,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
             delay_type = "word"
             sleep(generate_delay(delay_type, min_letterdelay,
-                max_letterdelay, min_worddelay, max_worddelay))
+                                 max_letterdelay, min_worddelay, max_worddelay))
 
             # Fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
@@ -190,7 +190,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     if fail_on_purpose == False:
                         imported_dictionary[usage_example] = english_word
                 except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                   try:
+                    try:
                         driver.find_element(By.CLASS_NAME, "blue")
                         print("Literowka/Synonim")
                     except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
