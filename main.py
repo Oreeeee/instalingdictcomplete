@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.by import By
+from selenium.common import exceptions as SeleniumEx
+from json.decoder import JSONDecodeError
 from time import sleep
 import json
 import os
@@ -33,7 +35,6 @@ def save_dictionary(dictionary_file, imported_dictionary):
     j = json.dumps(imported_dictionary)
     with(open(dictionary_file, "w")) as f:
         f.write(j)
-        f.close()
 
 
 def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
@@ -82,7 +83,14 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     is_german = False
     checked_language = False
     while done_sessions < session_count:
-        imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
+        try:
+            imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
+        except FileNotFoundError:
+            print("Podany plik słownika nie istnieje!")
+            exit()
+        except JSONDecodeError:
+            print("Plik słownika jest uszkodzony!")
+            exit()
 
         # Start session loop
         sleep(.5)
@@ -93,10 +101,10 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 try:
                     driver.find_element(By.ID, "start_session_button").click()
                     break
-                except:
+                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                     driver.find_element(By.ID, "continue_session_button").click()
                     break
-            except:
+            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                 pass
 
         sleep(1)
@@ -106,7 +114,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 print("Wykryto jezyk niemiecki")
                 is_german = True
                 checked_language = True
-            except:
+            except Exception:
                 print("Wykryto jezyk angielski")
                 is_german = False
                 checked_language = True
@@ -117,7 +125,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             try:
                 driver.find_element(By.ID, "return_mainpage").click()
                 break
-            except:
+            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                 pass
 
             # Find answer field and submit the answer
@@ -143,7 +151,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                             click_on_german_letter(letter)
                         else:
                             answer_field.send_keys(letter)
-                except:
+                except Exception:
                     pass
 
                 fail_on_purpose == False
@@ -156,14 +164,16 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 try:
                     driver.find_element(By.ID, "check").click()
                     break
-                except:
-                    pass
+                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
+                    print(
+                        "Nie można sprawdzić odpowiedzi. Możliwy problem z InstaLingiem, internetem lub skryptem.")
+
             sleep(.5)
             # Check result
             try:
                 driver.find_element(By.CLASS_NAME, "green")
                 print("Poprawna odpowiedź")
-            except:
+            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                 try:
                     driver.find_element(By.CLASS_NAME, "red")
                     print("Niepoprawna odpowiedź")
@@ -173,23 +183,29 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     # Only add correct answer to dictionary when not failed on purpose
                     if fail_on_purpose == False:
                         imported_dictionary[usage_example] = english_word
-                except:
-                    try:
+                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
+                   try:
                         driver.find_element(By.CLASS_NAME, "blue")
                         print("Literowka/Synonim")
-                    except:
-                        pass
+                    except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
+                        print("Nie udało się znaleźć wyniku odpowiedzi.")
 
             while True:
                 try:
                     driver.find_element(By.ID, "nextword").click()
                     break
-                except:
-                    pass
+                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
+                    print(
+                        "Nie można sprawdzić odpowiedzi. Możliwy problem z InstaLingiem, internetem lub skryptem.")
 
             sleep(.25)
 
-        save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
+        try:
+            save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
+        except FileNotFoundError:
+            print("Podany słownik nie istnieje! Ignorowanie błędu.")
+            pass
+
         done_sessions += 1
     return imported_dictionary
 
