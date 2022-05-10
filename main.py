@@ -135,9 +135,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             answer_field = driver.find_element(By.ID, "answer")
 
             delay_type = "word"
-            for letter in polish_word:
-                sleep(generate_delay(delay_type, min_letterdelay,
-                      max_letterdelay, min_worddelay, max_worddelay))
+            sleep(generate_delay(delay_type, min_letterdelay,
+                max_letterdelay, min_worddelay, max_worddelay))
 
             # Fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
@@ -228,8 +227,8 @@ def main():
         min_letterdelay = float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
         max_letterdelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy literami słowa: "))
-        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami słowa: "))
+        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
+        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
 
         random_fail_percentage = int(input("Ile procent odpowiedzi ma być poprawnych?: "))
 
