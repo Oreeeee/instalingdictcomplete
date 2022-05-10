@@ -129,8 +129,15 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 pass
 
             # Find answer field and submit the answer
-            polish_word = driver.find_element(By.CLASS_NAME, "translations").text
-            usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
+            while True:
+                polish_word = driver.find_element(By.CLASS_NAME, "translations").text
+                usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
+
+                if polish_word == "" or usage_example == "":
+                    print("Nie wykryto słówka")
+                else:
+                    break
+
             print(f"Słowo: {polish_word}, Przykład użycia: {usage_example}")
             answer_field = driver.find_element(By.ID, "answer")
 
