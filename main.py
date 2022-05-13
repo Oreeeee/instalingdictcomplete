@@ -36,9 +36,17 @@ def instaling_login(login, password):
         "log_password": password,
     }, headers=ua)
 
-    print(instaling_login.text)
+    # Sorry for my Regex skills
+    try:
+        instaling_id = re.findall("\/ling2\/html_app\/app.php\?child_id=\d\d\d\d\d\d\d", instaling_login.text)
+        instaling_id = instaling_id[0].strip("/ling2/html_app/app.php?child_id=")
+    except IndexError:
+        return None
 
-    # return instaling_login.cookies.get_dict()
+    login_data = []
+    login_data.append(instaling_id)
+    login_data.append(requests_session.cookies.get_dict())
+    return login_data
 
 
 def click_on_german_letter(letter):
@@ -209,9 +217,16 @@ if __name__ == '__main__':
     }
 
     # Log into the website
-    login = input("Podaj login do konta ucznia: ")
-    password = input("Podaj hasło: ")
-    instaling_login(login, password)
+    while True:
+        login = input("Podaj login do konta ucznia: ")
+        password = input("Podaj hasło: ")
+        login_data = instaling_login(login, password)
+        if login_data == None:
+            print("Nie udało się zalogować.")
+        else:
+            instaling_id = login_data[0]
+            instaling_cookies = login_data[1]
+            break
 
     while True:
         session_count = int(input("Ile sesji wykonać?: "))
