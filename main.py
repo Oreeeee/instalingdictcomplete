@@ -1,28 +1,10 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium.webdriver.common.by import By
-from selenium.common import exceptions as SeleniumEx
 from json.decoder import JSONDecodeError
-from time import sleep
-import json
-import os
-import platform
+import requests
 import random
-
-# Detect OS
-user_os = platform.system()
-
-# Initialize webdriver
-firefox_options = webdriver.FirefoxOptions()
-firefox_profile = webdriver.FirefoxProfile()
-firefox_options.add_argument("-headless")
-firefox_profile.set_preference("media.volume_scale", "0.0")
-if user_os == "Windows":
-    firefox_binary = FirefoxBinary(r"C:\Program Files\Mozilla Firefox\firefox.exe")
-    driver = webdriver.Firefox(firefox_binary=firefox_binary,
-                               options=firefox_options, firefox_profile=firefox_profile)
-else:
-    driver = webdriver.Firefox(options=firefox_options, firefox_profile=firefox_profile)
+import json
+import time
+import os
+import re
 
 
 def import_dictionary(dictionary_file):
@@ -47,18 +29,16 @@ def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, 
 
 
 def instaling_login(login, password):
-    driver.get("https://instaling.pl/teacher.php?page=login")
-    driver.implicitly_wait(5)
-    driver.find_element(By.ID, "log_email").send_keys(login)
-    driver.find_element(By.ID, "log_password").send_keys(password)
-    driver.find_element(By.CLASS_NAME, "mb-3").click()
+    instaling_login = requests_session.post("https://instaling.pl/teacher.php?page=teacherActions", data={
+        "action": "login",
+        "from": "",
+        "log_email": login,
+        "log_password": password,
+    })
 
-    driver.implicitly_wait(5)
+    print(instaling_login.text)
 
-    if driver.current_url == "https://instaling.pl/teacher.php?page=login":
-        return False
-    else:
-        return True
+    # return instaling_login.cookies.get_dict()
 
 
 def click_on_german_letter(letter):
@@ -84,7 +64,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     checked_language = False
     while done_sessions < session_count:
         try:
-            imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
+            imported_dictionary = import_dictionary(
+                dictionary_file)  # Load dictionary
         except FileNotFoundError:
             print("Podany plik słownika nie istnieje!")
             exit()
@@ -102,7 +83,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     driver.find_element(By.ID, "start_session_button").click()
                     break
                 except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    driver.find_element(By.ID, "continue_session_button").click()
+                    driver.find_element(
+                        By.ID, "continue_session_button").click()
                     break
             except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                 pass
@@ -130,8 +112,10 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
             # Find answer field and submit the answer
             while True:
-                polish_word = driver.find_element(By.CLASS_NAME, "translations").text
-                usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
+                polish_word = driver.find_element(
+                    By.CLASS_NAME, "translations").text
+                usage_example = driver.find_element(
+                    By.CLASS_NAME, "usage_example").text
 
                 if polish_word == "" or usage_example == "":
                     print("Nie wykryto słówka")
@@ -207,7 +191,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             sleep(.25)
 
         try:
-            save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
+            # Save dictionary
+            save_dictionary(dictionary_file, imported_dictionary)
         except FileNotFoundError:
             print("Podany słownik nie istnieje! Ignorowanie błędu.")
             pass
@@ -216,33 +201,30 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     return imported_dictionary
 
 
-def main():
+if __name__ == '__main__':
+    requests_session = requests.Session()
+
     # Log into the website
-    while True:
-        login = input("Podaj login do konta ucznia: ")
-        password = input("Podaj hasło: ")
-        if instaling_login(login, password) == True:
-            print("Zalogowano!")
-            driver.implicitly_wait(5)
-            break
-        else:
-            print("Nie udało się zalogować!")
+    login = input("Podaj login do konta ucznia: ")
+    password = input("Podaj hasło: ")
+    instaling_login(login, password)
 
     while True:
         session_count = int(input("Ile sesji wykonać?: "))
 
-        min_letterdelay = float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
-        max_letterdelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
+        min_letterdelay = float(
+            input("Podaj minimalne opóźnienie pomiędzy literami: "))
+        max_letterdelay = float(
+            input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
-        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
+        min_worddelay = float(
+            input("Podaj minimalne opóźnienie pomiędzy słowami: "))
+        max_worddelay = float(
+            input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
 
-        random_fail_percentage = int(input("Ile procent odpowiedzi ma być poprawnych?: "))
+        random_fail_percentage = int(
+            input("Ile procent odpowiedzi ma być poprawnych?: "))
 
         dictionary_file = input("Z jakiego pliku słownika skorzystać?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
                       min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
-
-
-if __name__ == '__main__':
-    main()
