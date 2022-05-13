@@ -1,3 +1,4 @@
+## Branch v2 zawiera testowy rewrite. Nie zaleca się korzystania z tego brancha, skorzystaj z brancha master. W przyszłości rewrite stanie się głównym projektem.
 # Instaling Dictionary Complete
 Automatyczne uzupełnianie słówek na InstaLing
 
