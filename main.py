@@ -34,7 +34,7 @@ def instaling_login(login, password):
         "from": "",
         "log_email": login,
         "log_password": password,
-    })
+    }, headers=ua)
 
     print(instaling_login.text)
 
@@ -203,6 +203,10 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
 if __name__ == '__main__':
     requests_session = requests.Session()
+
+    ua = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+    }
 
     # Log into the website
     login = input("Podaj login do konta ucznia: ")
