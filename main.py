@@ -145,6 +145,7 @@ if __name__ == '__main__':
         else:
             instaling_id = login_data[0]
             instaling_cookies = login_data[1]
+            print("Zalogowano!")
             break
 
     while True:
