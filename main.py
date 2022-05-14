@@ -5,7 +5,6 @@ import requests
 import random
 import json
 import time
-import os
 import re
 
 
@@ -21,7 +20,7 @@ def save_dictionary(dictionary_file, imported_dictionary):
 
 
 def generate_delay(min_delay=0.0, max_delay=0.0):
-    sleep(round(random.uniform(min_delay, max_delay)))
+    sleep(round(random.uniform(min_delay, max_delay)), 3)
 
 
 def instaling_login(login, password):
@@ -50,7 +49,13 @@ def instaling_login(login, password):
 def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
     for session_number in range(session_count):
         # Import dictionary
-        imported_dictionary = import_dictionary(dictionary_file)
+        try:
+            imported_dictionary = import_dictionary(dictionary_file)
+        except FileNotFoundError:
+            print("Nie znaleziono pliku słownika.")
+        except JSONDecodeError:
+            print(
+                "Niepoprawny format pliku słownika. Słownik prawdopodobnie jest uszkodzony!")
 
         while True:
             # Reset answer variable
@@ -68,6 +73,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
             print(
                 f"Słowo: {polish_word}. Przykład użycia: {usage_example}. ID: {word_id}")
+
+            generate_delay(min_delay=min_worddelay, max_delay=max_worddelay)
 
             # Don't submit answer if answer is marked as fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
@@ -100,7 +107,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 if english_word == word_answer:
                     print("Poprawna odpowiedź.")
                 else:
-                    print(f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: {english_word}")
+                    print(
+                        f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: {english_word}")
 
                     if fail_on_purpose == False:
                         # Add word to dictionary
@@ -110,8 +118,12 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 print(f"Zakończono sesję {session_number}")
                 break
 
-    # Save dictionary
-    save_dictionary(dictionary_file, imported_dictionary)
+        # Save dictionary
+        save_dictionary(dictionary_file, imported_dictionary)
+
+    print("Zakończono wszystkie sesje")
+    sleep(5)
+    exit()
 
 
 if __name__ == '__main__':
