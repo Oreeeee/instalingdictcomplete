@@ -1,4 +1,6 @@
 from json.decoder import JSONDecodeError
+from time import sleep
+from urllib import response
 import requests
 import random
 import json
@@ -13,19 +15,13 @@ def import_dictionary(dictionary_file):
 
 
 def save_dictionary(dictionary_file, imported_dictionary):
-    os.remove(dictionary_file)
-    j = json.dumps(imported_dictionary)
-    with(open(dictionary_file, "w")) as f:
+    j = json.dumps(imported_dictionary, indent=4)
+    with open(dictionary_file, "w") as f:
         f.write(j)
 
 
-def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
-    if delay_type == "letter":
-        delay = round(random.uniform(min_letterdelay, max_letterdelay), 3)
-    elif delay_type == "word":
-        delay = round(random.uniform(min_worddelay, max_worddelay), 3)
-
-    return delay
+def generate_delay(min_delay=0.0, max_delay=0.0):
+    sleep(round(random.uniform(min_delay, max_delay)))
 
 
 def instaling_login(login, password):
@@ -36,10 +32,12 @@ def instaling_login(login, password):
         "log_password": password,
     }, headers=ua)
 
-    # Sorry for my Regex skills
+    # Search for UserID, sorry for my Regex skills
     try:
-        instaling_id = re.findall("\/ling2\/html_app\/app.php\?child_id=\d\d\d\d\d\d\d", instaling_login.text)
-        instaling_id = instaling_id[0].strip("/ling2/html_app/app.php?child_id=")
+        instaling_id = re.findall(
+            "\/ling2\/html_app\/app.php\?child_id=\d\d\d\d\d\d\d", instaling_login.text)
+        instaling_id = instaling_id[0].strip(
+            "/ling2/html_app/app.php?child_id=")
     except IndexError:
         return None
 
@@ -49,164 +47,70 @@ def instaling_login(login, password):
     return login_data
 
 
-def click_on_german_letter(letter):
-    # This is an example of violation of DRY rule. Don't do this!
-    letters = {
-        "ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[2]').click()",
-        "ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[3]').click()",
-        "ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[4]').click()",
-        "ß": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[5]').click()",
-        "Ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[6]').click()",
-        "Ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[7]').click()",
-        "Ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[8]').click()"
-    }
-
-    exec(letters[letter])
-
-
 def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
-    done_sessions = 0
-    fail_on_purpose = False
-    german_alphabet = "äöüßÄÖÜ"
-    is_german = False
-    checked_language = False
-    while done_sessions < session_count:
-        try:
-            imported_dictionary = import_dictionary(
-                dictionary_file)  # Load dictionary
-        except FileNotFoundError:
-            print("Podany plik słownika nie istnieje!")
-            exit()
-        except JSONDecodeError:
-            print("Plik słownika jest uszkodzony!")
-            exit()
+    for session_number in range(session_count):
+        # Import dictionary
+        imported_dictionary = import_dictionary(dictionary_file)
 
-        # Start session loop
-        sleep(.5)
-        driver.find_element(By.CLASS_NAME, "btn-session").click()
-        sleep(.5)
         while True:
-            try:
-                try:
-                    driver.find_element(By.ID, "start_session_button").click()
-                    break
-                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    driver.find_element(
-                        By.ID, "continue_session_button").click()
-                    break
-            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                pass
+            # Reset answer variable
+            word_answer = ""
 
-        sleep(1)
-        if checked_language == False:
-            try:
-                driver.find_element(By.CLASS_NAME, "special_character_button")
-                print("Wykryto jezyk niemiecki")
-                is_german = True
-                checked_language = True
-            except Exception:
-                print("Wykryto jezyk angielski")
-                is_german = False
-                checked_language = True
+            # Get next word
+            instaling_word = requests.post("https://instaling.pl/ling2/server/actions/generate_next_word.php", data={
+                "child_id": instaling_id,
+                "date": time.time() * 1000
+            }, headers=ua, cookies=instaling_cookies)
 
-        # Start a new session
-        while True:
-            # Check if session is done
-            try:
-                driver.find_element(By.ID, "return_mainpage").click()
-                break
-            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                pass
+            polish_word = instaling_word.json()["translations"]
+            usage_example = instaling_word.json()["usage_example"]
+            word_id = instaling_word.json()["id"]
 
-            # Find answer field and submit the answer
-            while True:
-                polish_word = driver.find_element(
-                    By.CLASS_NAME, "translations").text
-                usage_example = driver.find_element(
-                    By.CLASS_NAME, "usage_example").text
+            print(
+                f"Słowo: {polish_word}. Przykład użycia: {usage_example}. ID: {word_id}")
 
-                if polish_word == "" or usage_example == "":
-                    print("Nie wykryto słówka")
-                else:
-                    break
-
-            print(f"Słowo: {polish_word}, Przykład użycia: {usage_example}")
-            answer_field = driver.find_element(By.ID, "answer")
-
-            delay_type = "word"
-            sleep(generate_delay(delay_type, min_letterdelay,
-                                 max_letterdelay, min_worddelay, max_worddelay))
-
-            # Fail on purpose
+            # Don't submit answer if answer is marked as fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
                 try:
                     english_word = imported_dictionary[usage_example]
                     for letter in english_word:
-                        delay_type = "letter"
-                        sleep(generate_delay(delay_type, min_letterdelay,
-                              max_letterdelay, min_worddelay, max_worddelay))
-                        if letter in german_alphabet:
-                            click_on_german_letter(letter)
-                        else:
-                            answer_field.send_keys(letter)
-                except Exception:
-                    pass
+                        generate_delay(min_delay=min_letterdelay,
+                                       max_delay=max_letterdelay)
+                        word_answer = word_answer + letter
+                except KeyError:
+                    print("Nie znaleziono słowa w słowniku")
+                    exit()
 
-                fail_on_purpose == False
-
+                fail_on_purpose = False
             else:
                 print("Celowy brak odpowiedzi")
-                fail_on_purpose == True
+                fail_on_purpose = True
 
-            while True:
-                try:
-                    driver.find_element(By.ID, "check").click()
-                    break
-                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    print(
-                        "Nie można sprawdzić odpowiedzi. Możliwy problem z InstaLingiem, internetem lub skryptem.")
+            # Submit answer
+            instaling_answer = requests.post("https://instaling.pl/ling2/server/actions/save_answer.php", data={
+                "child_id": instaling_id,
+                "word_id": word_id,
+                "answer": word_answer,
+            }, headers=ua, cookies=instaling_cookies)
 
-            sleep(.5)
-            # Check result
+            # Check if answer is correct
             try:
-                driver.find_element(By.CLASS_NAME, "green")
-                print("Poprawna odpowiedź")
-            except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                try:
-                    driver.find_element(By.CLASS_NAME, "red")
-                    print("Niepoprawna odpowiedź")
-                    english_word = driver.find_element(By.ID, "word").text
-                    print(f"Poprawna odpowiedź: {english_word}")
+                if instaling_answer.json()["word"] == word_answer:
+                    print("Poprawna odpowiedź.")
+                else:
+                    print(f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: " {instaling_answer.json()["word"]})
 
-                    # Only add correct answer to dictionary when not failed on purpose
                     if fail_on_purpose == False:
-                        imported_dictionary[usage_example] = english_word
-                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    try:
-                        driver.find_element(By.CLASS_NAME, "blue")
-                        print("Literowka/Synonim")
-                    except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                        print("Nie udało się znaleźć wyniku odpowiedzi.")
+                        # Add word to dictionary
+                        imported_dictionary[usage_example] = instaling_answer.json()[
+                            "word"]
+            except KeyError:
+                # End session
+                print(f"Zakończono sesję {session_number}")
+                break
 
-            while True:
-                try:
-                    driver.find_element(By.ID, "nextword").click()
-                    break
-                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    print(
-                        "Nie można sprawdzić odpowiedzi. Możliwy problem z InstaLingiem, internetem lub skryptem.")
-
-            sleep(.25)
-
-        try:
-            # Save dictionary
-            save_dictionary(dictionary_file, imported_dictionary)
-        except FileNotFoundError:
-            print("Podany słownik nie istnieje! Ignorowanie błędu.")
-            pass
-
-        done_sessions += 1
-    return imported_dictionary
+    # Save dictionary
+    save_dictionary(dictionary_file, imported_dictionary)
 
 
 if __name__ == '__main__':
@@ -221,6 +125,8 @@ if __name__ == '__main__':
         login = input("Podaj login do konta ucznia: ")
         password = input("Podaj hasło: ")
         login_data = instaling_login(login, password)
+
+        # Parse the data that instaling_login() returns
         if login_data == None:
             print("Nie udało się zalogować.")
         else:
