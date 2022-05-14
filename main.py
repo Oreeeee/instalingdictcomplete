@@ -57,26 +57,9 @@ def instaling_login(login, password):
         return True
 
 
-def click_on_german_letter(letter):
-    # This is an example of violation of DRY rule. Don't do this!
-    letters = {
-        "ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[2]').click()",
-        "ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[3]').click()",
-        "ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[4]').click()",
-        "ß": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[5]').click()",
-        "Ä": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[6]').click()",
-        "Ö": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[7]').click()",
-        "Ü": "driver.find_element(By.XPATH, '/html/body/div/div[8]/div[2]/div[2]/div[8]').click()"
-    }
-
-    exec(letters[letter])
-
-
 def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
     done_sessions = 0
     fail_on_purpose = False
-    is_german = False
-    checked_language = False
     while done_sessions < session_count:
         try:
             imported_dictionary = import_dictionary(
@@ -105,16 +88,6 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 pass
 
         sleep(1)
-        if checked_language == False:
-            try:
-                driver.find_element(By.CLASS_NAME, "special_character_button")
-                print("Wykryto jezyk niemiecki")
-                is_german = True
-                checked_language = True
-            except Exception:
-                print("Wykryto jezyk angielski")
-                is_german = False
-                checked_language = True
 
         # Start a new session
         while True:
@@ -149,10 +122,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     for letter in english_word:
                         generate_delay(min_delay=min_letterdelay,
                                        max_delay=max_letterdelay)
-                        if letter in german_alphabet:
-                            click_on_german_letter(letter)
-                        else:
-                            answer_field.send_keys(letter)
+                        answer_field.send_keys(letter)
                 except Exception:
                     pass
 
