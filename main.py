@@ -93,17 +93,18 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                 "answer": word_answer,
             }, headers=ua, cookies=instaling_cookies)
 
+            english_word = instaling_answer.json()["word"]
+
             # Check if answer is correct
             try:
-                if instaling_answer.json()["word"] == word_answer:
+                if english_word == word_answer:
                     print("Poprawna odpowiedź.")
                 else:
-                    print(f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: " {instaling_answer.json()["word"]})
+                    print(f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: {english_word}")
 
                     if fail_on_purpose == False:
                         # Add word to dictionary
-                        imported_dictionary[usage_example] = instaling_answer.json()[
-                            "word"]
+                        imported_dictionary[usage_example] = english_word
             except KeyError:
                 # End session
                 print(f"Zakończono sesję {session_number}")
