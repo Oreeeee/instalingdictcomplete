@@ -62,10 +62,15 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             word_answer = ""
 
             # Get next word
-            instaling_word = requests.post("https://instaling.pl/ling2/server/actions/generate_next_word.php", data={
-                "child_id": instaling_id,
-                "date": time.time() * 1000
-            }, headers=ua, cookies=instaling_cookies)
+            try:
+                instaling_word = requests.post("https://instaling.pl/ling2/server/actions/generate_next_word.php", data={
+                    "child_id": instaling_id,
+                    "date": time.time() * 1000
+                }, headers=ua, cookies=instaling_cookies)
+            except KeyError:
+                # End session
+                print(f"Zakończono sesję {session_number}")
+                break
 
             polish_word = instaling_word.json()["translations"]
             usage_example = instaling_word.json()["usage_example"]
@@ -102,20 +107,16 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             english_word = instaling_answer.json()["word"]
 
             # Check if answer is correct
-            try:
-                if english_word == word_answer:
-                    print("Poprawna odpowiedź.")
-                else:
-                    print(
-                        f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: {english_word}")
+            if english_word == word_answer:
+               print("Poprawna odpowiedź.")
+            else:
+                print(
+                    f"Niepoprawna odpowiedź. - Poprawna odpowiedź to: {english_word}")
 
-                    if fail_on_purpose == False:
-                        # Add word to dictionary
-                        imported_dictionary[usage_example] = english_word
-            except KeyError:
-                # End session
-                print(f"Zakończono sesję {session_number}")
-                break
+                if fail_on_purpose == False:
+                    # Add word to dictionary
+                    imported_dictionary[usage_example] = english_word
+            
 
         # Save dictionary
         save_dictionary(dictionary_file, imported_dictionary)
