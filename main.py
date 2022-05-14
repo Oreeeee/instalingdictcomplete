@@ -20,7 +20,7 @@ def save_dictionary(dictionary_file, imported_dictionary):
 
 
 def generate_delay(min_delay=0.0, max_delay=0.0):
-    sleep(round(random.uniform(min_delay, max_delay)), 3)
+    sleep(round(random.uniform(min_delay, max_delay), 3))
 
 
 def instaling_login(login, password):
