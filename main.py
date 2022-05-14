@@ -18,11 +18,13 @@ firefox_profile = webdriver.FirefoxProfile()
 firefox_options.add_argument("-headless")
 firefox_profile.set_preference("media.volume_scale", "0.0")
 if user_os == "Windows":
-    firefox_binary = FirefoxBinary(r"C:\Program Files\Mozilla Firefox\firefox.exe")
+    firefox_binary = FirefoxBinary(
+        r"C:\Program Files\Mozilla Firefox\firefox.exe")
     driver = webdriver.Firefox(firefox_binary=firefox_binary,
                                options=firefox_options, firefox_profile=firefox_profile)
 else:
-    driver = webdriver.Firefox(options=firefox_options, firefox_profile=firefox_profile)
+    driver = webdriver.Firefox(
+        options=firefox_options, firefox_profile=firefox_profile)
 
 
 def import_dictionary(dictionary_file):
@@ -31,19 +33,13 @@ def import_dictionary(dictionary_file):
 
 
 def save_dictionary(dictionary_file, imported_dictionary):
-    os.remove(dictionary_file)
     j = json.dumps(imported_dictionary)
-    with(open(dictionary_file, "w")) as f:
+    with open(dictionary_file, "w") as f:
         f.write(j)
 
 
-def generate_delay(delay_type, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay):
-    if delay_type == "letter":
-        delay = round(random.uniform(min_letterdelay, max_letterdelay), 3)
-    elif delay_type == "word":
-        delay = round(random.uniform(min_worddelay, max_worddelay), 3)
-
-    return delay
+def generate_delay(min_delay=0.1, max_delay=0.1):
+    sleep(round(random.uniform(min_delay, max_delay), 3))
 
 
 def instaling_login(login, password):
@@ -79,12 +75,12 @@ def click_on_german_letter(letter):
 def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, dictionary_file, random_fail_percentage):
     done_sessions = 0
     fail_on_purpose = False
-    german_alphabet = "äöüßÄÖÜ"
     is_german = False
     checked_language = False
     while done_sessions < session_count:
         try:
-            imported_dictionary = import_dictionary(dictionary_file)  # Load dictionary
+            imported_dictionary = import_dictionary(
+                dictionary_file)  # Load dictionary
         except FileNotFoundError:
             print("Podany plik słownika nie istnieje!")
             exit()
@@ -102,7 +98,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                     driver.find_element(By.ID, "start_session_button").click()
                     break
                 except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-                    driver.find_element(By.ID, "continue_session_button").click()
+                    driver.find_element(
+                        By.ID, "continue_session_button").click()
                     break
             except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
                 pass
@@ -130,8 +127,10 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
 
             # Find answer field and submit the answer
             while True:
-                polish_word = driver.find_element(By.CLASS_NAME, "translations").text
-                usage_example = driver.find_element(By.CLASS_NAME, "usage_example").text
+                polish_word = driver.find_element(
+                    By.CLASS_NAME, "translations").text
+                usage_example = driver.find_element(
+                    By.CLASS_NAME, "usage_example").text
 
                 if polish_word == "" or usage_example == "":
                     print("Nie wykryto słówka")
@@ -141,18 +140,15 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             print(f"Słowo: {polish_word}, Przykład użycia: {usage_example}")
             answer_field = driver.find_element(By.ID, "answer")
 
-            delay_type = "word"
-            sleep(generate_delay(delay_type, min_letterdelay,
-                                 max_letterdelay, min_worddelay, max_worddelay))
+            generate_delay(min_delay=min_worddelay, max_delay=max_worddelay)
 
             # Fail on purpose
             if random.randint(1, 100) <= random_fail_percentage:
                 try:
                     english_word = imported_dictionary[usage_example]
                     for letter in english_word:
-                        delay_type = "letter"
-                        sleep(generate_delay(delay_type, min_letterdelay,
-                              max_letterdelay, min_worddelay, max_worddelay))
+                        generate_delay(min_delay=min_letterdelay,
+                                       max_delay=max_letterdelay)
                         if letter in german_alphabet:
                             click_on_german_letter(letter)
                         else:
@@ -207,7 +203,8 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
             sleep(.25)
 
         try:
-            save_dictionary(dictionary_file, imported_dictionary)  # Save dictionary
+            # Save dictionary
+            save_dictionary(dictionary_file, imported_dictionary)
         except FileNotFoundError:
             print("Podany słownik nie istnieje! Ignorowanie błędu.")
             pass
@@ -216,7 +213,9 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     return imported_dictionary
 
 
-def main():
+if __name__ == '__main__':
+    german_alphabet = "äöüßÄÖÜ"
+
     # Log into the website
     while True:
         login = input("Podaj login do konta ucznia: ")
@@ -231,18 +230,19 @@ def main():
     while True:
         session_count = int(input("Ile sesji wykonać?: "))
 
-        min_letterdelay = float(input("Podaj minimalne opóźnienie pomiędzy literami: "))
-        max_letterdelay = float(input("Podaj maksymalne opóźnienie pomiędzy literami: "))
+        min_letterdelay = float(
+            input("Podaj minimalne opóźnienie pomiędzy literami: "))
+        max_letterdelay = float(
+            input("Podaj maksymalne opóźnienie pomiędzy literami: "))
 
-        min_worddelay = float(input("Podaj minimalne opóźnienie pomiędzy słowami: "))
-        max_worddelay = float(input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
+        min_worddelay = float(
+            input("Podaj minimalne opóźnienie pomiędzy słowami: "))
+        max_worddelay = float(
+            input("Podaj maksymalne opóźnienie pomiędzy słowami: "))
 
-        random_fail_percentage = int(input("Ile procent odpowiedzi ma być poprawnych?: "))
+        random_fail_percentage = int(
+            input("Ile procent odpowiedzi ma być poprawnych?: "))
 
         dictionary_file = input("Z jakiego pliku słownika skorzystać?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
                       min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
-
-
-if __name__ == '__main__':
-    main()
