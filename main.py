@@ -86,7 +86,6 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
                         word_answer = word_answer + letter
                 except KeyError:
                     print("Nie znaleziono słowa w słowniku")
-                    exit()
 
                 fail_on_purpose = False
             else:
