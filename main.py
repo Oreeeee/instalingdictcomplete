@@ -183,7 +183,7 @@ def start_session(session_count, min_letterdelay, max_letterdelay, min_worddelay
     return imported_dictionary
 
 
-if __name__ == '__main__':
+def main():
     german_alphabet = "äöüßÄÖÜ"
 
     # Log into the website
@@ -216,3 +216,7 @@ if __name__ == '__main__':
         dictionary_file = input("Z jakiego pliku słownika skorzystać?: ")
         start_session(session_count, min_letterdelay, max_letterdelay,
                       min_worddelay, max_worddelay, dictionary_file, random_fail_percentage)
+
+
+if __name__ == '__main__':
+    main()
