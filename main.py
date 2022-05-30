@@ -189,7 +189,7 @@ def initialize_driver():
     # Initialize webdriver
     firefox_options = webdriver.FirefoxOptions()
     firefox_profile = webdriver.FirefoxProfile()
-    # firefox_options.add_argument("-headless")
+    firefox_options.add_argument("-headless")
     firefox_profile.set_preference("media.volume_scale", "0.0")
     if user_os == "Windows":
         firefox_binary = FirefoxBinary(
