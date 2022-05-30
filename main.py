@@ -4,11 +4,12 @@ from selenium.webdriver.common.by import By
 from selenium.common import exceptions as SeleniumEx
 from json.decoder import JSONDecodeError
 from time import sleep
-import json
-import os
 import platform
+import requests
 import random
+import json
 
+SCRIPT_VERSION = 14
 
 def import_dictionary(dictionary_file):
     try:
@@ -175,6 +176,10 @@ class InstalingAPI:
             return False
 
 
+def check_for_updates():
+    if requests.get("https://raw.githubusercontent.com/Oreeeee/instalingdictcomplete/master/current_version.txt").text > SCRIPT_VERSION:
+        print("Nowsza wersja skryptu jest dostępna! Pobierz ją z https://github.com/Oreeeee/instalingdictcomplete/releases")
+
 def initialize_driver():
     global driver
 
@@ -211,6 +216,8 @@ def instaling_login_form(instaling):
 
 
 def main():
+    check_for_updates()
+
     initialize_driver()
 
     # Initialize Instaling class
