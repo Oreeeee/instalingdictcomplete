@@ -177,7 +177,7 @@ class InstalingAPI:
 
 
 def check_for_updates():
-    if requests.get("https://raw.githubusercontent.com/Oreeeee/instalingdictcomplete/master/current_version.txt").text > SCRIPT_VERSION:
+    if int(requests.get("https://raw.githubusercontent.com/Oreeeee/instalingdictcomplete/master/current_version.txt").text) > SCRIPT_VERSION:
         print("Nowsza wersja skryptu jest dostępna! Pobierz ją z https://github.com/Oreeeee/instalingdictcomplete/releases")
 
 def initialize_driver():
