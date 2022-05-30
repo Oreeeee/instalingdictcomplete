@@ -11,6 +11,7 @@ import json
 
 SCRIPT_VERSION = 14
 
+
 def import_dictionary(dictionary_file):
     try:
         imported_dictionary = json.load(open(dictionary_file))
@@ -60,6 +61,13 @@ class InstalingAPI:
 
             # Session loop
             while True:
+                # Check is session done
+                try:
+                    self.complete_session()
+                    break
+                except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
+                    pass
+
                 usage_example = self.find_word()
                 fail_on_purpose = self.submit_answer(
                     usage_example, min_letterdelay, max_letterdelay, min_worddelay, max_worddelay, random_fail_percentage, imported_dictionary)
@@ -67,11 +75,9 @@ class InstalingAPI:
                 if type(answer_result) == str:
                     if fail_on_purpose == False:
                         self.add_word_to_dictionary(
-                            usage_example, answer_result[1], dictionary_file, imported_dictionary)
-                if self.is_session_done() == True:
-                    break
-                else:
-                    self.next_word()
+                            usage_example, answer_result, dictionary_file, imported_dictionary)
+
+                self.next_word()
 
     def start_session(self):
         driver.find_element(By.CLASS_NAME, "btn-session").click()
@@ -90,6 +96,8 @@ class InstalingAPI:
                 pass
 
     def find_word(self):
+        sleep(.5)
+
         while True:
             polish_word = driver.find_element(
                 By.CLASS_NAME, "translations").text
@@ -111,19 +119,22 @@ class InstalingAPI:
 
         fail_on_purpose = False
         answer_field = driver.find_element(By.ID, "answer")
-        # Fail on purpose
-        if random.randint(1, 100) <= random_fail_percentage:
-            english_word = imported_dictionary[usage_example]
-            for letter in english_word:
-                generate_delay(min_delay=min_letterdelay,
-                               max_delay=max_letterdelay)
-                answer_field.send_keys(letter)
+        try:
+            # Fail on purpose
+            if random.randint(1, 100) <= random_fail_percentage:
+                english_word = imported_dictionary[usage_example]
+                for letter in english_word:
+                    generate_delay(min_delay=min_letterdelay,
+                                   max_delay=max_letterdelay)
+                    answer_field.send_keys(letter)
 
-            fail_on_purpose == False
+                fail_on_purpose == False
 
-        else:
-            print("Celowy brak odpowiedzi")
-            fail_on_purpose == True
+            else:
+                print("Celowy brak odpowiedzi")
+                fail_on_purpose == True
+        except KeyError:
+            pass
 
         while True:
             try:
@@ -136,6 +147,8 @@ class InstalingAPI:
         return fail_on_purpose
 
     def check_answer(self):
+        sleep(.5)
+
         # Check result
         try:
             driver.find_element(By.CLASS_NAME, "green")
@@ -160,6 +173,8 @@ class InstalingAPI:
         save_dictionary(dictionary_file, imported_dictionary)
 
     def next_word(self):
+        sleep(.5)
+
         while True:
             try:
                 driver.find_element(By.ID, "nextword").click()
@@ -168,17 +183,15 @@ class InstalingAPI:
                 print(
                     "Nie można sprawdzić odpowiedzi. Możliwy problem z InstaLingiem, internetem lub skryptem.")
 
-    def is_session_done(self):
-        try:
-            driver.find_element(By.ID, "return_mainpage").click()
-            return True
-        except (SeleniumEx.ElementNotInteractableException, SeleniumEx.NoSuchElementException):
-            return False
+    def complete_session(self):
+        sleep(.5)
+        driver.find_element(By.ID, "return_mainpage").click()
 
 
 def check_for_updates():
     if int(requests.get("https://raw.githubusercontent.com/Oreeeee/instalingdictcomplete/master/current_version.txt").text) > SCRIPT_VERSION:
         print("Nowsza wersja skryptu jest dostępna! Pobierz ją z https://github.com/Oreeeee/instalingdictcomplete/releases")
+
 
 def initialize_driver():
     global driver
